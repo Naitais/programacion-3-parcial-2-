@@ -8,7 +8,7 @@ JavaScript puro**, autenticación con **JWT** y contraseñas hasheadas con
 **bcrypt**.
 
 - **Integrante:** Enzo Fuentes
-- **Repositorio:** https://github.com/Naitais/programacion-3-parcial-2-
+
 
 ---
 
