@@ -7,6 +7,9 @@ Backend con **Node.js + Express + MySQL**, frontend con **HTML, CSS y
 JavaScript puro**, autenticación con **JWT** y contraseñas hasheadas con
 **bcrypt**.
 
+- **Integrante:** Enzo Fuentes
+- **Repositorio:** https://github.com/Naitais/programacion-3-parcial-2-
+
 ---
 
 ## 1. Puesta en marcha
