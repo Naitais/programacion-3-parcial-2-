@@ -1,0 +1,9 @@
+# Dependencias instaladas por npm (se reinstalan con npm install)
+node_modules/
+
+# Variables de entorno: NUNCA se suben al repositorio
+.env
+
+# Archivos del sistema
+Thumbs.db
+.DS_Store

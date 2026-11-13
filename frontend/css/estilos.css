@@ -1,0 +1,446 @@
+/* ============================================================
+   ARCHIVO: frontend/css/estilos.css
+   ============================================================
+   PARA QUE EXISTE:
+   Define la presentacion del sistema: colores, espacios,
+   tipografia y la forma de la tabla y los formularios.
+   Un solo archivo para las dos paginas (login y panel).
+
+   COMO SE USA EN EL PROYECTO:
+   index.html lo carga con href="css/estilos.css" y
+   pages/dashboard.html con href="../css/estilos.css" (tiene
+   que subir un nivel porque esta dentro de la carpeta pages).
+
+   ORGANIZACION:
+   1. Base y variables de color
+   2. Pantalla de login
+   3. Estructura del panel (menu + contenido)
+   4. Formularios y botones
+   5. Tabla de turnos
+   6. Mensajes y utilidades
+   ============================================================ */
+
+/* ---------- 1. BASE Y VARIABLES ---------- */
+
+/* Las variables de CSS se definen una vez y se usan en todo el
+   archivo con var(--nombre). Si hay que cambiar el azul del
+   sistema, se cambia aca y se actualiza todo. */
+:root {
+    --azul: #002855;
+    --azul-claro: #004080;
+    --gris-fondo: #f4f6f8;
+    --gris-borde: #d8dde2;
+    --verde: #1b7f4b;
+    --rojo: #b3261e;
+    --amarillo: #8a6100;
+    --texto: #222;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--gris-fondo);
+    color: var(--texto);
+}
+
+h1, h2, h3 {
+    color: var(--azul);
+    margin-top: 0;
+}
+
+.subtitulo {
+    color: #666;
+    font-size: 14px;
+}
+
+/* ---------- 2. PANTALLA DE LOGIN ---------- */
+
+.contenedor {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.tarjeta {
+    width: 100%;
+    max-width: 430px;
+    padding: 32px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px #00000015;
+}
+
+.tarjeta form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 20px;
+}
+
+/* Caja con los usuarios de prueba para la demostracion */
+.ayuda-usuarios {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gris-borde);
+    font-size: 13px;
+    color: #555;
+}
+
+.boton-usuario {
+    background: #eef2f6;
+    color: var(--azul);
+    border: 1px solid var(--gris-borde);
+    padding: 7px 12px;
+    margin: 4px 4px 0 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.boton-usuario:hover {
+    background: #e2e8ee;
+}
+
+/* ---------- 3. ESTRUCTURA DEL PANEL ---------- */
+
+/* El panel es una grilla de dos columnas: el menu fijo de
+   230px y el contenido que ocupa el resto (1fr). */
+.dashboard {
+    display: grid;
+    grid-template-columns: 230px 1fr;
+    min-height: 100vh;
+}
+
+.sidebar {
+    background: var(--azul);
+    color: white;
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar h2 {
+    color: white;
+    font-size: 19px;
+    margin-bottom: 24px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    /* flex-grow empuja el boton de cerrar sesion hasta abajo */
+    flex-grow: 1;
+}
+
+.sidebar nav a {
+    color: #cfd9e4;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.sidebar nav a:hover {
+    background: var(--azul-claro);
+    color: white;
+}
+
+/* La opcion del menu en la que estamos parados */
+.sidebar nav a.activo {
+    background: var(--azul-claro);
+    color: white;
+    font-weight: bold;
+}
+
+#cerrarSesion {
+    background: #ffffff22;
+    border: 1px solid #ffffff55;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#cerrarSesion:hover {
+    background: #ffffff33;
+}
+
+.contenido {
+    padding: 28px 32px;
+    overflow-x: auto;
+}
+
+.encabezado {
+    border-bottom: 1px solid var(--gris-borde);
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+}
+
+.encabezado h1 {
+    margin-bottom: 6px;
+}
+
+/* Linea que identifica al usuario que inicio sesion */
+#datosUsuario {
+    margin: 0;
+    color: #555;
+    font-size: 14px;
+}
+
+.seccion {
+    background: white;
+    padding: 22px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #00000010;
+}
+
+.tarjeta-info {
+    background: var(--gris-fondo);
+    border: 1px solid var(--gris-borde);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 16px;
+}
+
+.tarjeta-info h3 {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.tarjeta-info ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* ---------- 4. FORMULARIOS Y BOTONES ---------- */
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+    margin-bottom: 4px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 6px;
+    font-size: 15px;
+    background: white;
+}
+
+input:disabled {
+    background: #eef0f2;
+    color: #666;
+}
+
+button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: var(--azul);
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--azul-claro);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* Variantes de botones */
+button.secundario {
+    background: #5a6b7d;
+}
+
+button.peligro {
+    background: var(--rojo);
+}
+
+button.chico {
+    padding: 5px 9px;
+    font-size: 12px;
+    margin: 1px;
+}
+
+/* Formulario en grilla: se acomoda solo segun el ancho.
+   auto-fit + minmax hace que las columnas se reorganicen en
+   pantallas chicas sin escribir media queries. */
+.formulario {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.formulario-acciones {
+    grid-column: 1 / -1;   /* ocupa todo el ancho */
+}
+
+/* Fila de filtros */
+.filtros, .formulario-linea {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 18px;
+    padding: 14px;
+    background: var(--gris-fondo);
+    border: 1px solid var(--gris-borde);
+    border-radius: 8px;
+}
+
+.filtros > div, .formulario-linea > div {
+    flex: 1 1 160px;
+}
+
+.filtros-botones {
+    display: flex;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+/* Panel de reprogramacion */
+.panel {
+    border: 2px solid var(--azul-claro);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 18px;
+    background: #f7faff;
+}
+
+.panel h3 {
+    font-size: 16px;
+}
+
+/* ---------- 5. TABLA ---------- */
+
+.tabla-contenedor {
+    overflow-x: auto;   /* si no entra, se puede desplazar */
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tabla thead th {
+    background: var(--azul);
+    color: white;
+    text-align: left;
+    padding: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.tabla tbody td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--gris-borde);
+    vertical-align: middle;
+}
+
+.tabla tbody tr:hover {
+    background: #f7f9fb;
+}
+
+.tabla small {
+    color: #777;
+}
+
+td.acciones {
+    white-space: nowrap;
+}
+
+.contador {
+    font-size: 13px;
+    color: #666;
+    margin: 0 0 8px 0;
+}
+
+/* Etiquetas de estado del turno */
+.etiqueta {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.estado-reservado {
+    background: #fff4d6;
+    color: var(--amarillo);
+}
+
+.estado-confirmado {
+    background: #d9f2e3;
+    color: var(--verde);
+}
+
+.estado-cancelado {
+    background: #fbdedc;
+    color: var(--rojo);
+}
+
+/* ---------- 6. MENSAJES Y UTILIDADES ---------- */
+
+.mensaje-ok {
+    color: var(--verde);
+    background: #eaf7f0;
+    border-left: 4px solid var(--verde);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.mensaje-error {
+    color: var(--rojo);
+    background: #fdeeed;
+    border-left: 4px solid var(--rojo);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#mensaje {
+    overflow-wrap: anywhere;
+    margin-bottom: 0;
+}
+
+#aviso:empty {
+    display: none;   /* si no hay aviso, no deja un hueco */
+}
+
+/* Clase clave del proyecto: la usa JavaScript para mostrar y
+   esconder secciones y opciones del menu segun el rol. */
+.oculto {
+    display: none !important;
+}
+
+/* En pantallas chicas el menu pasa arriba */
+@media (max-width: 760px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+    .sidebar nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}

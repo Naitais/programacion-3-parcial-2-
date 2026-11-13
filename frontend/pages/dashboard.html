@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<!--
+=============================================================
+ARCHIVO: frontend/pages/dashboard.html
+=============================================================
+PARA QUE EXISTE:
+Es el panel del sistema: la VISTA principal. Define la
+estructura (el esqueleto) de todas las pantallas: menu, tabla
+de turnos, formulario de turno nuevo, reprogramacion y
+pacientes.
+
+COMO SE USA EN EL PROYECTO:
+Se entra despues del login. dashboard.js se encarga de:
+  - comprobar que haya sesion,
+  - mostrar u ocultar las opciones segun el rol,
+  - traer los datos del backend y llenar la tabla.
+
+DETALLE IMPORTANTE - EL ATRIBUTO data-roles:
+Cada opcion del menu tiene escrito que roles la pueden ver:
+    <a data-seccion="nuevo" data-roles="ADMIN,PACIENTE">
+dashboard.js lee ese atributo y esconde las opciones que no
+corresponden. Asi "adaptamos el frontend al perfil que inicio
+sesion", como pide la consigna.
+
+OJO: esto es solo la cara visible. Ocultar un boton no es
+seguridad. La seguridad de verdad esta en el backend, que
+revisa el token y el rol en cada pedido.
+=============================================================
+-->
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel | Gestion de Turnos Medicos</title>
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <!-- ======================= MENU ======================= -->
+    <aside class="sidebar">
+        <h2>Turnos Medicos</h2>
+
+        <nav id="menu">
+            <a href="#" class="activo" data-seccion="inicio"
+               data-roles="ADMIN,MEDICO,PACIENTE">Inicio</a>
+
+            <a href="#" data-seccion="turnos"
+               data-roles="ADMIN,MEDICO,PACIENTE">Turnos</a>
+
+            <a href="#" data-seccion="nuevo"
+               data-roles="ADMIN,PACIENTE">Nuevo turno</a>
+
+            <a href="#" data-seccion="pacientes"
+               data-roles="ADMIN,MEDICO">Pacientes</a>
+
+            <a href="#" data-seccion="misdatos"
+               data-roles="PACIENTE">Mis datos</a>
+        </nav>
+
+        <button id="cerrarSesion" type="button">Cerrar sesion</button>
+    </aside>
+
+    <!-- ===================== CONTENIDO ==================== -->
+    <main class="contenido">
+
+        <header class="encabezado">
+            <h1 id="tituloSeccion">Panel principal</h1>
+            <!-- Aca dashboard.js escribe quien inicio sesion.
+                 Cumple el pedido de "identificar al usuario". -->
+            <p id="datosUsuario">Cargando usuario...</p>
+        </header>
+
+        <!-- Cartel de avisos: exitos en verde, errores en rojo -->
+        <p id="aviso" role="status" aria-live="polite"></p>
+
+        <!-- ---------------- SECCION INICIO ---------------- -->
+        <section id="seccionInicio" class="seccion">
+            <h2>Bienvenida/o al sistema</h2>
+            <p>Desde este panel se administran los turnos del centro medico.</p>
+
+            <div class="tarjeta-info">
+                <h3>Tu sesion</h3>
+                <ul id="listaSesion">
+                    <!-- la llena dashboard.js -->
+                </ul>
+            </div>
+
+            <div class="tarjeta-info">
+                <h3>Que podes hacer con tu perfil</h3>
+                <ul id="listaPermisos">
+                    <!-- la llena dashboard.js segun el rol -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- ---------------- SECCION TURNOS ---------------- -->
+        <section id="seccionTurnos" class="seccion oculto">
+            <h2>Gestion de turnos</h2>
+
+            <!-- FILTROS (mejora funcional: busqueda y filtros) -->
+            <form id="formFiltros" class="filtros">
+                <div>
+                    <label for="filtroDesde">Desde</label>
+                    <input type="date" id="filtroDesde">
+                </div>
+                <div>
+                    <label for="filtroHasta">Hasta</label>
+                    <input type="date" id="filtroHasta">
+                </div>
+                <div>
+                    <label for="filtroEstado">Estado</label>
+                    <select id="filtroEstado">
+                        <option value="">Todos</option>
+                        <option value="Reservado">Reservado</option>
+                        <option value="Confirmado">Confirmado</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
+                <div class="filtros-botones">
+                    <button type="submit">Buscar</button>
+                    <button type="button" id="botonLimpiar" class="secundario">
+                        Limpiar
+                    </button>
+                </div>
+            </form>
+
+            <!-- PANEL DE REPROGRAMACION (oculto hasta que se usa) -->
+            <div id="panelReprogramar" class="panel oculto">
+                <h3>Reprogramar turno <span id="reprogramarIdTexto"></span></h3>
+
+                <form id="formReprogramar" class="formulario-linea">
+                    <!-- type="hidden" guarda el id del turno sin
+                         mostrarlo en pantalla -->
+                    <input type="hidden" id="reprogramarId">
+
+                    <div>
+                        <label for="reprogramarFecha">Nueva fecha</label>
+                        <input type="date" id="reprogramarFecha" required>
+                    </div>
+                    <div>
+                        <label for="reprogramarHora">Nueva hora</label>
+                        <input type="time" id="reprogramarHora" required>
+                    </div>
+                    <div>
+                        <label for="reprogramarDisponibilidad">Franja del medico</label>
+                        <select id="reprogramarDisponibilidad" required></select>
+                    </div>
+                    <div class="filtros-botones">
+                        <button type="submit">Guardar cambios</button>
+                        <button type="button" id="botonCancelarReprogramar"
+                                class="secundario">Cerrar</button>
+                    </div>
+                </form>
+            </div>
+
+            <p id="contadorTurnos" class="contador"></p>
+
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Paciente</th>
+                            <th>Medico</th>
+                            <th>Practica</th>
+                            <th>Equipo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <!-- Las filas las genera dashboard.js -->
+                    <tbody id="cuerpoTablaTurnos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ------------- SECCION NUEVO TURNO ------------- -->
+        <section id="seccionNuevo" class="seccion oculto">
+            <h2>Nuevo turno</h2>
+            <p class="subtitulo">
+                Los desplegables se van filtrando entre si: al elegir la
+                practica solo aparecen los medicos y equipos habilitados.
+            </p>
+
+            <form id="formNuevoTurno" class="formulario">
+
+                <!-- Solo lo ve el administrador: el paciente saca
+                     turnos para si mismo. -->
+                <div id="campoPaciente">
+                    <label for="nuevoPaciente">Paciente</label>
+                    <select id="nuevoPaciente"></select>
+                </div>
+
+                <div>
+                    <label for="nuevaPractica">Practica</label>
+                    <select id="nuevaPractica" required>
+                        <option value="">Elegi una practica</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="nuevoMedico">Medico</label>
+                    <select id="nuevoMedico" required>
+                        <option value="">Primero elegi la practica</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="nuevaDisponibilidad">Franja horaria del medico</label>
+                    <select id="nuevaDisponibilidad" required>
+                        <option value="">Primero elegi el medico</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="nuevoEquipo">Equipo (si la practica lo necesita)</label>
+                    <select id="nuevoEquipo">
+                        <option value="">Sin equipo</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="nuevaFecha">Fecha</label>
+                    <input type="date" id="nuevaFecha" required>
+                </div>
+
+                <div>
+                    <label for="nuevaHora">Hora</label>
+                    <input type="time" id="nuevaHora" required>
+                </div>
+
+                <div>
+                    <label for="nuevoMedio">Medio de solicitud</label>
+                    <select id="nuevoMedio">
+                        <option value="Web">Web</option>
+                        <option value="Teléfono">Telefono</option>
+                        <option value="Email">Email</option>
+                        <option value="Presencial">Presencial</option>
+                    </select>
+                </div>
+
+                <div class="formulario-acciones">
+                    <button type="submit">Guardar turno</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- -------------- SECCION PACIENTES -------------- -->
+        <section id="seccionPacientes" class="seccion oculto">
+            <h2>Pacientes</h2>
+
+            <form id="formBuscarPaciente" class="filtros">
+                <div>
+                    <label for="buscarPaciente">Buscar por nombre, apellido o DNI</label>
+                    <input type="text" id="buscarPaciente" placeholder="Ej: Perez">
+                </div>
+                <div class="filtros-botones">
+                    <button type="submit">Buscar</button>
+                </div>
+            </form>
+
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>DNI</th>
+                            <th>Apellido y nombre</th>
+                            <th>Telefono</th>
+                            <th>Email</th>
+                            <th>Obra social</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaPacientes"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- --------------- SECCION MIS DATOS -------------- -->
+        <section id="seccionMisDatos" class="seccion oculto">
+            <h2>Mis datos</h2>
+            <p class="subtitulo">
+                Podes actualizar tu telefono y tu correo electronico.
+            </p>
+
+            <form id="formMisDatos" class="formulario">
+                <div>
+                    <label for="misDatosNombre">Nombre</label>
+                    <input type="text" id="misDatosNombre" disabled>
+                </div>
+                <div>
+                    <label for="misDatosDni">DNI</label>
+                    <input type="text" id="misDatosDni" disabled>
+                </div>
+                <div>
+                    <label for="misDatosTelefono">Telefono</label>
+                    <input type="text" id="misDatosTelefono" maxlength="15">
+                </div>
+                <div>
+                    <label for="misDatosEmail">Email</label>
+                    <input type="email" id="misDatosEmail">
+                </div>
+                <div class="formulario-acciones">
+                    <button type="submit">Guardar cambios</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+</div>
+
+<!-- El orden importa: sesion.js, api.js y despues dashboard.js -->
+<script src="../js/sesion.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/dashboard.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+=============================================================
+ARCHIVO: frontend/index.html
+=============================================================
+PARA QUE EXISTE:
+Es la pantalla de login, la puerta de entrada al sistema.
+Es la UNICA pantalla que se puede ver sin haber iniciado sesion.
+
+COMO SE USA EN EL PROYECTO:
+Se abre con Live Server (http://127.0.0.1:5500/...) o
+directamente desde el backend (http://localhost:3000).
+Cuando el login sale bien, app.js guarda el token y redirige
+a pages/dashboard.html.
+
+ORDEN DE LOS SCRIPTS (importante):
+  1) sesion.js -> define guardarSesion y obtenerToken
+  2) api.js    -> los usa para mandar el token
+  3) app.js    -> usa a los dos
+Si se cambia el orden, da error "function is not defined".
+=============================================================
+-->
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso | Gestion de Turnos Medicos</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+    <main class="contenedor">
+        <section class="tarjeta">
+            <h1>Gestion de Turnos Medicos</h1>
+            <p class="subtitulo">Ingresa con tu cuenta para continuar.</p>
+
+            <!-- El formulario no usa action ni method: lo maneja
+                 JavaScript con fetch (ver app.js). -->
+            <form id="formLogin">
+                <label for="email">Correo electronico</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="usuario@turnos.com"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="password">Contrasenia</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Ingresa tu contrasenia"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button type="submit">Iniciar sesion</button>
+            </form>
+
+            <!-- Aca app.js escribe el resultado (verde si entro,
+                 rojo si hubo error). aria-live hace que los
+                 lectores de pantalla lo anuncien. -->
+            <p id="mensaje" role="status" aria-live="polite"></p>
+
+            <!-- Ayuda para la demostracion: los tres perfiles.
+                 Al hacer clic se completa el formulario solo. -->
+            <div class="ayuda-usuarios">
+                <p><strong>Usuarios de prueba</strong> (clic para completar)</p>
+                <button type="button" class="boton-usuario"
+                        data-email="admin@turnos.com"
+                        data-password="AdminTurnos2026!">
+                    Administrador
+                </button>
+                <button type="button" class="boton-usuario"
+                        data-email="medico@turnos.com"
+                        data-password="MedicoTurnos2026!">
+                    Medico
+                </button>
+                <button type="button" class="boton-usuario"
+                        data-email="paciente@turnos.com"
+                        data-password="PacienteTurnos2026!">
+                    Paciente
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/sesion.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
