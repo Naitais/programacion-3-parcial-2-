@@ -80,7 +80,9 @@ async function pedir(ruta, metodo = 'GET', cuerpo = null) {
 
     // 7) Si el token vencio o no sirve, cerramos la sesion y
     //    volvemos al login. Pasa despues de 2 horas (expiresIn).
-    if (respuesta.status === 401) {
+    //    Solo si HABIA un token: en el login, un 401 significa
+    //    "contrasenia incorrecta", no "sesion vencida".
+    if (respuesta.status === 401 && token) {
         alert('Tu sesion vencio. Volve a iniciar sesion.');
         cerrarSesion(rutaDelLogin());
         throw new Error('Sesion vencida');
